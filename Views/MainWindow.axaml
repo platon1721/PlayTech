@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:ViewModels;assembly=ViewModels"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
-        x:Class="RouletteApp.Views.MainWindow"
+        x:Class="Views.MainWindow"
         Title="Roulette App"
         Background="#333333">
 
@@ -19,7 +19,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
-        <!-- Tulemuste paneel -->
+        <!-- Results -->
         <Border Grid.Row="0" Background="#222222" CornerRadius="5" Padding="10" Margin="0,0,0,10">
             <StackPanel>
                 <TextBlock Text="Last 10 results" Foreground="White" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,5"/>
@@ -58,14 +58,14 @@
             </StackPanel>
         </Border>
         
-        <!-- Käskude ja statistika paneelid -->
+        <!-- Panels -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             
-            <!-- Käskude paneel -->
+            <!-- butons -->
             <Border Grid.Column="0" Background="#222222" CornerRadius="5" Padding="10" Margin="0,0,5,0">
                 <StackPanel>
                     <TextBlock Text="Commands" Foreground="White" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,5"/>
@@ -89,7 +89,7 @@
                 </StackPanel>
             </Border>
             
-            <!-- Statistika paneel -->
+            <!-- Statistics -->
             <Border Grid.Column="1" Background="#222222" CornerRadius="5" Padding="10" Margin="5,0,0,0">
                 <StackPanel>
                     <TextBlock Text="Statistics" Foreground="White" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,5"/>
@@ -100,7 +100,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         
-                        <!-- Aktiivsed mängijad -->
+                        <!-- Players -->
                         <Border Grid.Column="0" Background="#333333" CornerRadius="5" Padding="10" Margin="0,0,5,0">
                             <StackPanel>
                                 <TextBlock Text="Active Players" Foreground="White" HorizontalAlignment="Center"/>
@@ -112,7 +112,7 @@
                             </StackPanel>
                         </Border>
                         
-                        <!-- Suurim multiplier -->
+                        <!-- Max multiplier -->
                         <Border Grid.Column="1" Background="#333333" CornerRadius="5" Padding="10" Margin="5,0,0,0">
                             <StackPanel>
                                 <TextBlock Text="Biggest Multiplier" Foreground="White" HorizontalAlignment="Center"/>
@@ -128,7 +128,7 @@
             </Border>
         </Grid>
         
-        <!-- Teadete paneel -->
+        <!-- Messages -->
         <Border Grid.Row="2" Background="#222222" CornerRadius="5" Padding="10" Margin="0,10,0,0"
                 IsVisible="{Binding IsNotificationVisible}">
             <StackPanel>
