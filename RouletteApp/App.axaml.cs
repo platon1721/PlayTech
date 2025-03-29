@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using RouletteApp.Views;
+using Views;
 using ViewModels;
 
 namespace RouletteApp

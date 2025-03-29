@@ -1,13 +1,13 @@
-using System;
+
 using System.Collections.ObjectModel;
-using System.Reactive;
-using System.Threading.Tasks;
-using System.Timers;
+using System.Windows.Input;
 using Avalonia.Threading;
+using Commands;
+using Models;
 using ReactiveUI;
 using RouletteApp.Models;
-using RouletteApp.Services;
 using RouletteApp.ViewModels;
+using Services;
 
 namespace ViewModels
 {
@@ -46,8 +46,8 @@ namespace ViewModels
             set => this.RaiseAndSetIfChanged(ref _statistics, value);
         }
 
-        public ReactiveCommand<Unit, Unit> AddRandomResultCommand { get; }
-        public ReactiveCommand<Unit, Unit> ShowNotificationCommand { get; }
+        public ICommand AddRandomResultCommand { get; }
+        public ICommand ShowNotificationCommand { get; }
 
         public MainWindowViewModel()
         {
@@ -56,8 +56,12 @@ namespace ViewModels
             _statistics = new Statistics();
             _currentStreak = 0;
             
-            AddRandomResultCommand = ReactiveCommand.Create(AddRandomResult);
-            ShowNotificationCommand = ReactiveCommand.Create(ShowNotification);
+            // Kasuta RelayCommand klassi
+            AddRandomResultCommand = new RelayCommand(() => 
+                Dispatcher.UIThread.Post(AddRandomResult));
+                
+            ShowNotificationCommand = new RelayCommand(() => 
+                Dispatcher.UIThread.Post(ShowNotification));
             
             // Käivita TCP kuulaja
             _tcpListenerService = new TcpListenerService();
@@ -87,9 +91,9 @@ namespace ViewModels
             // Loo uus tulemus
             var result = new RouletteResult(position, _currentStreak);
             
-            // Lisa tulemuste nimekirja
+            // Lisa tulemuste nimekirja - see jookseb juba UI lõimes
             Results.Add(result);
-            
+    
             // Kui tulemusi on rohkem kui 10, eemalda vanim
             if (Results.Count > 10)
             {
@@ -120,17 +124,17 @@ namespace ViewModels
             IsNotificationVisible = true;
     
             // Pärast 5 sekundit peida teade
-            var timer = new System.Timers.Timer(5000); // Täpsusta, et kasutad System.Timers.Timer
-            timer.Elapsed += (s, e) =>
+            var timer = new DispatcherTimer
             {
-                Dispatcher.UIThread.Post(() =>
-                {
-                    IsNotificationVisible = false;
-                });
+                Interval = TimeSpan.FromSeconds(5)
+            };
+            
+            timer.Tick += (s, e) =>
+            {
+                IsNotificationVisible = false;
                 timer.Stop();
             };
-    
-            timer.AutoReset = false; // Veendumaks, et taimer käivitub ainult ühe korra
+            
             timer.Start();
         }
 

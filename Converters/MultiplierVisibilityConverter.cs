@@ -2,7 +2,7 @@ using System;
 using Avalonia.Data.Converters;
 using Avalonia.Data;
 
-namespace RouletteApp.Converters
+namespace Converters
 {
     public class MultiplierVisibilityConverter : IValueConverter
     {

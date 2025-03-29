@@ -1,4 +1,4 @@
-namespace RouletteApp.Models
+namespace Models
 {
     public class RouletteResult
     {
@@ -8,11 +8,12 @@ namespace RouletteApp.Models
         
         public RouletteResult(int position, int streak)
         {
+            Console.WriteLine("Roulette Result constructor: " + position + ", " + streak);
             Position = position;
-            // Arvuta multiplier valemi M = R * N järgi
+            // Multiplier M = R * N järgi
             Multiplier = position * streak;
             
-            // Määra värv vastavalt positsioonile
+            // Color
             if (position == 0)
             {
                 Color = "Green";

@@ -37,9 +37,9 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 
-                                <TextBlock Grid.Row="0" 
-                                           Text="{Binding Multiplier, StringFormat=x{0}}" 
-                                           Foreground="White" 
+                                <TextBlock Grid.Row="0"
+                                           Text="{Binding Multiplier, StringFormat=x{0}}"
+                                           Foreground="White"
                                            HorizontalAlignment="Center"
                                            IsVisible="{Binding Multiplier, Converter={StaticResource MultiplierVisibilityConverter}}"/>
                                 

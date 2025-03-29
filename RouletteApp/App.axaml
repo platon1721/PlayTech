@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:RouletteApp"
+             xmlns:converters1="clr-namespace:Converters;assembly=Converters"
              x:Class="RouletteApp.App">
     <Application.DataTemplates>
         <local:ViewLocator/>
@@ -12,9 +13,10 @@
     
     <Application.Resources>
         <ResourceDictionary>
+            <converters1:MultiplierVisibilityConverter x:Key="MultiplierVisibilityConverter"/>
+            
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
-                    <!-- Dark theme resources here -->
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>

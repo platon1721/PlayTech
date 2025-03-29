@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Converters\Converters.csproj" />
       <ProjectReference Include="..\ViewModels\ViewModels.csproj" />
     </ItemGroup>
 

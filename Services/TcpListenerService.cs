@@ -4,8 +4,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using RouletteApp.Models;
+using Avalonia.Threading;
 
-namespace RouletteApp.Services
+namespace Services
 {
     public class TcpListenerService
     {
@@ -71,7 +72,13 @@ namespace RouletteApp.Services
             try
             {
                 var statistics = JsonSerializer.Deserialize<Statistics>(message);
-                StatisticsReceived?.Invoke(this, statistics);
+                if (statistics != null)
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        StatisticsReceived?.Invoke(this, statistics);
+                    });
+                }
             }
             catch (Exception ex)
             {
