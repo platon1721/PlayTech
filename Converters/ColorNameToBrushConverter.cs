@@ -22,7 +22,7 @@ namespace Converters
                     case "Green":
                         return Application.Current.FindResource("ResultGreenBrush");
                     default:
-                        return Brushes.Gray; // vaikevärv, kui midagi muud ei sobi
+                        return Brushes.Gray;
                 }
             }
             

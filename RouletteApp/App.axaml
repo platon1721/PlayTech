@@ -14,13 +14,33 @@
     <Application.Resources>
         <ResourceDictionary>
             
+            <!-- Result background colors -->
             <Color x:Key="ResultRedColor">#ad1f1f</Color>
             <SolidColorBrush x:Key="ResultRedBrush" Color="{StaticResource ResultRedColor}"/>
             <Color x:Key="ResultBlackColor">#151537</Color>
             <SolidColorBrush x:Key="ResultBlackBrush" Color="{StaticResource ResultBlackColor}"/>
             <Color x:Key="ResultGreenColor">#036303</Color>
             <SolidColorBrush x:Key="ResultGreenBrush" Color="{StaticResource ResultGreenColor}"/>
-        
+            
+            <!-- Result border colors -->
+            <Color x:Key="ResultBorderRedColor">#ff8080</Color>
+            <SolidColorBrush x:Key="ResultBorderRedBrush" Color="{StaticResource ResultBorderRedColor}"/>
+            <Color x:Key="ResultBorderBlackColor">#668cff</Color>
+            <SolidColorBrush x:Key="ResultBorderBlackBrush" Color="{StaticResource ResultBorderBlackColor}"/>
+            <Color x:Key="ResultBorderGreenColor">#26d926</Color>
+            <SolidColorBrush x:Key="ResultBorderGreenBrush" Color="{StaticResource ResultBorderGreenColor}"/>
+            
+            
+            <!-- Result border shadow colors -->
+            <Color x:Key="ResultBorderShadowRedColor">#ff3385</Color>
+            <SolidColorBrush x:Key="ResultBorderShadowRedBrush" Color="{StaticResource ResultBorderShadowRedColor}"/>
+            <Color x:Key="ResultBorderShadowBlackColor">#00bfff</Color>
+            <SolidColorBrush x:Key="ResultBorderShadowBlackBrush" Color="{StaticResource ResultBorderShadowBlackColor}"/>
+            <Color x:Key="ResultBorderShadowGreenColor">#1aff1a</Color>
+            <SolidColorBrush x:Key="ResultBorderShadowGreenBrush" Color="{StaticResource ResultBorderShadowGreenColor}"/>
+            
+            <converters:ColorNameToShadowColorConverter x:Key="ColorNameToShadowColorConverter"/>
+            <converters:ColorNameToBorderColorConverter x:Key="ColorNameToBorderColorConverter"/>
             <converters:ColorNameToBrushConverter x:Key="ColorNameToBrushConverter"/>
             <converters:MultiplierVisibilityConverter x:Key="MultiplierVisibilityConverter"/>
             
