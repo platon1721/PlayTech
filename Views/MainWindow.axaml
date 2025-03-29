@@ -41,7 +41,7 @@
                                            Text="{Binding Multiplier, StringFormat=x{0}}"
                                            Foreground="White"
                                            HorizontalAlignment="Center"
-                                           IsVisible="{Binding Multiplier, Converter={StaticResource MultiplierVisibilityConverter}}"/>
+                                           IsVisible="{Binding ShouldShowMultiplier}"/>
                                 
                                 <Border Grid.Row="1" Width="40" Height="40" CornerRadius="5" Margin="2"
                                         Background="{Binding Color}">

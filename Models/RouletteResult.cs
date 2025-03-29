@@ -5,7 +5,9 @@ namespace Models
         public int Position { get; set; }
         public int Multiplier { get; set; }
         public string Color { get; set; }
-        public RouletteResult?  PreviousResult { get; set; }
+        private RouletteResult?  PreviousResult { get; set; }
+        
+        public bool ShouldShowMultiplier => Multiplier > Position;
 
         public RouletteResult()
         {
