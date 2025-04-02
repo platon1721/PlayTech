@@ -1,5 +1,5 @@
 ﻿using Avalonia;
-using System;
+using Serilog;
 
 namespace RouletteApp
 {
@@ -11,7 +11,35 @@ namespace RouletteApp
                 .UsePlatformDetect()
                 .LogToTrace();
         
-        public static void Main(string[] args) => BuildAvaloniaApp()
-            .StartWithClassicDesktopLifetime(args);
+        public static void Main(string[] args)
+        {
+            
+            Console.WriteLine($"Rakenduse töökaust: {Directory.GetCurrentDirectory()}");
+            Directory.CreateDirectory("logs");
+            
+            // Setting Serilog
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.File("logs/roulette-app.log", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
+            try
+            {
+                Log.Information("Application started");
+                
+                // Run Avalonia app
+                BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Application start-up failed");
+            }
+            finally
+            {
+                // End Serilog
+                Log.CloseAndFlush();
+            }
+        }
     }
 }

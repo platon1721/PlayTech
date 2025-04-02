@@ -1,4 +1,4 @@
-namespace RouletteApp.Models
+namespace Models
 {
     public class Statistics
     {

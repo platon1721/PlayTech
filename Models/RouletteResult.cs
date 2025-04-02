@@ -1,3 +1,5 @@
+using Serilog;
+
 namespace Models
 {
     public class RouletteResult
@@ -6,31 +8,51 @@ namespace Models
         public int Multiplier { get; set; }
         public string Color { get; set; }
         private RouletteResult?  PreviousResult { get; set; }
+        private readonly ILogger _logger;
         
         public bool ShouldShowMultiplier => Multiplier > Position;
 
         public RouletteResult()
         {
+            _logger = Log.Logger;
             var random = new Random();
             Position = random.Next(maxValue: 37);
+            _logger.Information("New random result is: Position={Position}", 
+                Position);
+            
             Color = __getColor(Position);
             Multiplier = Position;
+            
+            _logger.Debug("New roulette result is: Position={Position}, Multiplier={Multiplier}, Color={Color}", 
+                Position, Multiplier, Color);
         }
-
+        
+        
         public RouletteResult(RouletteResult previousResult)
         {
+            _logger = Log.Logger;
             var random = new Random();
             Position = random.Next(maxValue: 37);
+            _logger.Information("New random result is: Position={Position}", 
+                Position);
+            
             Color = __getColor(Position);
             PreviousResult = previousResult;
+            _logger.Debug("Previous Result is: Position={Position}, Color={Color}",
+                PreviousResult.Position, PreviousResult.Color);
+            
             if (PreviousResult != null && PreviousResult.Color == Color)
             {
                 Multiplier = (PreviousResult.Multiplier / PreviousResult.Position + 1) * Position;
+                _logger.Information("The same color in a row; new multiplier is:{Multiplier}", Multiplier);
             }
             else
             {
                 Multiplier = Position;
+                _logger.Debug("New color; multiplier is 1.");
             }
+            _logger.Debug("Roulette result is: Position={Position}, Multiplier={Multiplier}, Color={Color}", 
+                Position, Multiplier, Color);
         }
 
 
