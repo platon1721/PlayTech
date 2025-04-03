@@ -1,3 +1,5 @@
+using System.Net.Sockets;
+using System.Text;
 using Moq;
 using Serilog;
 using Services;
@@ -230,6 +232,62 @@ namespace Tests
             method.Invoke(_service, new object[] { jsonMessage });
     
             Assert.That(eventRaised, Is.True, "StatisticsReceived event was not raised");
+        }
+        
+        
+        /// <summary>
+        /// Test TCP message receiving throw port 4948.
+        /// </summary>
+        [Test]
+        public async Task TcpListener_ReceivesValidMessage_RaisesEvent()
+        {
+            // Arrange
+            var testStats = new Statistics { ActivePlayers = 42, BiggestMultiplier = 8 };
+            var eventReceived = new TaskCompletionSource<Statistics>();
+            var testDispatcher = new TestDispatcher();
+            var service = new TcpListenerService(dispatcher: testDispatcher);
+    
+            // Listener
+            service.StatisticsReceived += (sender, stats) => {
+                eventReceived.SetResult(stats);
+            };
+    
+            // Service
+            service.Start();
+            await Task.Delay(500);
+    
+            try
+            {
+                // Act - send message TCP
+                using (var client = new TcpClient())
+                {
+                    await client.ConnectAsync("localhost", 4948);
+                    using (var stream = client.GetStream())
+                    {
+                        string jsonMessage = JsonSerializer.Serialize(testStats);
+                        byte[] messageBytes = Encoding.UTF8.GetBytes(jsonMessage);
+                        await stream.WriteAsync(messageBytes, 0, messageBytes.Length);
+                    }
+                }
+                
+                var timeoutTask = Task.Delay(5000);
+                var completedTask = await Task.WhenAny(eventReceived.Task, timeoutTask);
+        
+                // Assert
+                Assert.That(completedTask, Is.Not.EqualTo(timeoutTask), "Timeout waiting for event");
+        
+                if (completedTask != timeoutTask)
+                {
+                    var receivedStats = await eventReceived.Task;
+                    Assert.That(receivedStats.ActivePlayers, Is.EqualTo(testStats.ActivePlayers));
+                    Assert.That(receivedStats.BiggestMultiplier, Is.EqualTo(testStats.BiggestMultiplier));
+                }
+            }
+            finally
+            {
+                // END
+                service.Stop();
+            }
         }
     }
 }
