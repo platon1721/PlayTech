@@ -11,6 +11,10 @@ using ITimer = Services.ITimer;
 
 namespace ViewModels
 {
+    
+    /// <summary>
+    /// Main view model that manages roulette results, statistics, and notifications.
+    /// </summary>
     public class MainWindowViewModel : ViewModelBase
     {
         private bool _isNotificationVisible;
@@ -20,6 +24,7 @@ namespace ViewModels
         private ITimer _notificationTimer;
         
         
+        // Gets the collection of roulette results.
         public ObservableCollection<RouletteResult> Results => _resultTracker.Results;
         
         private readonly TcpListenerService _tcpListenerService;
@@ -30,27 +35,47 @@ namespace ViewModels
         // For testing
         public ITimer CurrentNotificationTimer => _notificationTimer;
         
+        /// <summary>
+        /// Gets or sets whether the notification is currently visible.
+        /// </summary>
         public bool IsNotificationVisible
         {
             get => _isNotificationVisible;
             set => this.RaiseAndSetIfChanged(ref _isNotificationVisible, value);
         }
 
+        /// <summary>
+        /// Gets or sets the notification text to display.
+        /// </summary>
         public string NotificationText
         {
             get => _notificationText;
             set => this.RaiseAndSetIfChanged(ref _notificationText, value);
         }
 
+        
+        /// <summary>
+        /// Gets or sets the current game statistics.
+        /// </summary>
         public Statistics Statistics
         {
             get => _statistics;
             set => this.RaiseAndSetIfChanged(ref _statistics, value);
         }
 
+        // Command to add a random roulette result.
         public ICommand AddRandomResultCommand { get; }
+        
+        // Command to display a notification message.
         public ICommand ShowNotificationCommand { get; }
 
+        
+        /// <summary>
+        /// Initializes a new view model with optional dependencies.
+        /// </summary>
+        /// <param name="logger">Logger for tracking operations</param>
+        /// <param name="dispatcher">UI thread dispatcher</param>
+        /// <param name="timerFactory">Factory for creating timers</param>
         public MainWindowViewModel(ILogger? logger = null, IDispatcher? dispatcher = null, Func<ITimer>? timerFactory = null)
         {
             
@@ -81,6 +106,8 @@ namespace ViewModels
             _logger.Information("MainWindowViewModel started.");
         }
 
+        
+        // Adds a new random roulette result to the tracker.
         private void AddRandomResult()
         {
             _logger.Information("Adding random result...");
@@ -92,6 +119,8 @@ namespace ViewModels
             Console.WriteLine(_resultTracker.Results.Count);
         }
 
+        
+        // Displays a player notification with an auto-dismiss timer.
         private void ShowNotification()
         {
             _logger.Information("Showing notification...");
@@ -115,6 +144,12 @@ namespace ViewModels
             _notificationTimer.Start();
         }
         
+        
+        /// <summary>
+        /// Handles statistics updates received from the TCP service.
+        /// </summary>
+        /// <param name="sender">Event sender</param>
+        /// <param name="statistics">New statistics data</param>
         private void OnStatisticsReceived(object? sender, Statistics statistics)
         {
             _logger.Information("New statistics received.");

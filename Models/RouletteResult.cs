@@ -2,16 +2,29 @@ using Serilog;
 
 namespace Models
 {
+    
+    /// <summary>
+    /// Represents a single roulette spin result with position, multiplier, and color data.
+    /// </summary>
     public class RouletteResult
     {
+        
+        // Gets or sets the position number (0-36).
         public int Position { get; set; }
+        // Gets or sets the multiplier value.
         public int Multiplier { get; set; }
+        // Gets or sets the color (Red, Black, or Green).
         public string Color { get; set; }
+        // Gets or sets the previous roulette result for streak calculations, if result is not the first.
         private RouletteResult?  PreviousResult { get; set; }
         private readonly ILogger _logger;
         
+        // Determines if multiplier should be displayed
         public bool ShouldShowMultiplier => Multiplier > Position;
 
+        /// <summary>
+        /// Creates a new roulette result with random position and default multiplier.
+        /// </summary>
         public RouletteResult()
         {
             _logger = Log.Logger;
@@ -27,7 +40,11 @@ namespace Models
                 Position, Multiplier, Color);
         }
         
-        
+        /// <summary>
+        /// Creates a new result that considers the previous result for multiplier calculation.
+        /// Multiplier is calculated by algorithm: (PreviousResult.Multiplier/PreviousResult.Position + 1) * Position
+        /// </summary>
+        /// <param name="previousResult">The previous spin result</param>
         public RouletteResult(RouletteResult previousResult)
         {
             _logger = Log.Logger;
@@ -56,6 +73,11 @@ namespace Models
         }
 
 
+        /// <summary>
+        /// Determines the color based on standard roulette wheel positions.
+        /// </summary>
+        /// <param name="position">The position number (0-36)</param>
+        /// <returns>Color name: "Green", "Red", or "Black"</returns>
         private static string __getColor(int position)
         {
             if (position == 0)

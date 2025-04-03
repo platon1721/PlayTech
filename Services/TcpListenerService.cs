@@ -7,6 +7,9 @@ using Serilog;
 
 namespace Services
 {
+    /// <summary>
+    /// Service for receiving statistics data over TCP connections.
+    /// </summary>
     public class TcpListenerService
     {
         private TcpListener? _listener;
@@ -15,15 +18,22 @@ namespace Services
         private readonly ILogger _logger;
         private readonly IDispatcher _dispatcher;
         
+        // Event raised when statistics data is received and validated.
         public event EventHandler<Statistics>? StatisticsReceived;
 
         
+        // <summary>
+        /// Initializes a new TCP listener service with optional logger and dispatcher.
+        /// </summary>
+        /// <param name="logger">Logger for service activity</param>
+        /// <param name="dispatcher">UI dispatcher for event invocation (uses Avalonia if null)</param>
         public TcpListenerService(ILogger? logger = null, IDispatcher? dispatcher = null)
         {
             _logger = logger ?? Log.Logger;
             _dispatcher = dispatcher ?? new AvaloniaDispatcher();
         }
         
+        // Starts the TCP listener service on the configured port.
         public void Start()
         {
             _isRunning = true;
@@ -31,6 +41,7 @@ namespace Services
             _ = Task.Run(ListenForMessages);
         }
 
+        // Stops the TCP listener service.
         public void Stop()
         {
             _isRunning = false;
@@ -38,6 +49,7 @@ namespace Services
             _logger.Information("TcpListenerService stopped");
         }
 
+        // Listens for incoming connections and manages client connection acceptance.
         private async Task ListenForMessages()
         {
             try
@@ -66,6 +78,10 @@ namespace Services
             }
         }
 
+        /// <summary>
+        /// Processes a client connection to receive statistics data.
+        /// </summary>
+        /// <param name="client">Connected TCP client</param>
         private async Task HandleClientAsync(TcpClient client)
         {
             try
@@ -91,6 +107,10 @@ namespace Services
             }
         }
 
+        /// <summary>
+        /// Deserializes and validates received JSON message as Statistics object.
+        /// </summary>
+        /// <param name="message">JSON message to process</param>
         private void ProcessMessage(string message)
         {
             try
