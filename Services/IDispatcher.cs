@@ -13,10 +13,4 @@ namespace Services
     {
         public void Post(Action action) => Dispatcher.UIThread.Post(action);
     }
-    
-    // Testing dispatcher
-    public class TestDispatcher : IDispatcher
-    {
-        public void Post(Action action) => action();
-    }
 }

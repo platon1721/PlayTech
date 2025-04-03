@@ -1,13 +1,13 @@
 
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using Avalonia.Threading;
 using Commands;
 using Models;
 using ReactiveUI;
-using RouletteApp.ViewModels;
 using Serilog;
 using Services;
+using IDispatcher = Services.IDispatcher;
+using ITimer = Services.ITimer;
 
 namespace ViewModels
 {
@@ -17,10 +17,18 @@ namespace ViewModels
         private string _notificationText = string.Empty;
         private Statistics _statistics;
         private ResultTracker _resultTracker;
+        private ITimer _notificationTimer;
+        
+        
         public ObservableCollection<RouletteResult> Results => _resultTracker.Results;
         
         private readonly TcpListenerService _tcpListenerService;
         private readonly ILogger _logger;
+        private readonly IDispatcher _dispatcher;
+        private readonly Func<ITimer> _timerFactory;
+        
+        // For testing
+        public ITimer CurrentNotificationTimer => _notificationTimer;
         
         public bool IsNotificationVisible
         {
@@ -43,20 +51,27 @@ namespace ViewModels
         public ICommand AddRandomResultCommand { get; }
         public ICommand ShowNotificationCommand { get; }
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(ILogger? logger = null, IDispatcher? dispatcher = null, Func<ITimer>? timerFactory = null)
         {
             
-            _logger = Log.Logger;
+            _logger = logger ?? Log.Logger;
+            _dispatcher = dispatcher ?? new AvaloniaDispatcher();
+            _timerFactory = timerFactory ?? (() => new AvaloniaTimer());
+            
             _logger.Information("MainWindowViewModel starting...");
-            _statistics = new Statistics();
+            _statistics = new Statistics
+            {
+                ActivePlayers = 0,
+                BiggestMultiplier = 0
+            };
             _resultTracker = new ResultTracker();
             
             // RelayCommand
             AddRandomResultCommand = new RelayCommand(() => 
-                Dispatcher.UIThread.Post(AddRandomResult));
+                _dispatcher.Post(AddRandomResult));
                 
             ShowNotificationCommand = new RelayCommand(() => 
-                Dispatcher.UIThread.Post(ShowNotification));
+                _dispatcher.Post(ShowNotification));
             
             // TCP start
             _tcpListenerService = new TcpListenerService();
@@ -74,6 +89,7 @@ namespace ViewModels
                 _resultTracker.LastResult?.Position, 
                 _resultTracker.LastResult?.Multiplier, 
                 _resultTracker.LastResult?.Color);
+            Console.WriteLine(_resultTracker.Results.Count);
         }
 
         private void ShowNotification()
@@ -81,32 +97,37 @@ namespace ViewModels
             _logger.Information("Showing notification...");
             NotificationText = "Player VIP PlayerName has joined the table.";
             IsNotificationVisible = true;
-    
-            // After 5sec remove
-            var timer = new DispatcherTimer
+            
+            // New timer
+            _notificationTimer = _timerFactory();
+            _notificationTimer.Interval = TimeSpan.FromSeconds(5);
+            
+            
+            _notificationTimer.Tick += (s, e) =>
             {
-                Interval = TimeSpan.FromSeconds(5)
+                _dispatcher.Post(() => {
+                    IsNotificationVisible = false;
+                    _notificationTimer.Stop();
+                    _logger.Information("Notification timed out.");
+                });
             };
             
-            timer.Tick += (s, e) =>
-            {
-                IsNotificationVisible = false;
-                timer.Stop();
-                _logger.Information("Notification timed out.");
-            };
-            
-            timer.Start();
+            _notificationTimer.Start();
         }
-
+        
         private void OnStatisticsReceived(object? sender, Statistics statistics)
         {
             _logger.Information("New statistics received.");
+    
             Statistics = new Statistics
             {
-                ActivePlayers = statistics.ActivePlayers > 0 ? statistics.ActivePlayers : Statistics.ActivePlayers,
-                BiggestMultiplier = statistics.BiggestMultiplier > 0 ? statistics.BiggestMultiplier : Statistics.BiggestMultiplier
+                // If active players statistics null, uses old statistics
+                ActivePlayers = statistics.ActivePlayers.HasValue ? statistics.ActivePlayers : Statistics.ActivePlayers,
+        
+                // If BiggestMultiplier statistics is null, uses old statistics
+                BiggestMultiplier = statistics.BiggestMultiplier.HasValue ? statistics.BiggestMultiplier : Statistics.BiggestMultiplier
             };
-    
+
             _logger.Information("Statistics updated in ViewModel");
         }
     }

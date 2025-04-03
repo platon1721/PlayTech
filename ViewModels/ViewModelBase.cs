@@ -1,6 +1,6 @@
 using ReactiveUI;
 
-namespace RouletteApp.ViewModels
+namespace ViewModels
 {
     public class ViewModelBase : ReactiveObject
     {

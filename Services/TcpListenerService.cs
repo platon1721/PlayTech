@@ -119,7 +119,8 @@ namespace Services
                 _logger.Information("Recived statistics: ActivePlayers={ActivePlayers}, BiggestMultiplier={BiggestMultiplier}",
                     statistics?.ActivePlayers, statistics?.BiggestMultiplier);
                 
-                bool hasValidData = statistics.ActivePlayers > 0 || statistics.BiggestMultiplier > 0;
+                bool hasValidData = statistics.ActivePlayers.HasValue &&   statistics.ActivePlayers >=0
+                                    || statistics.BiggestMultiplier.HasValue && statistics.BiggestMultiplier > 0;
                 
                 if (hasValidData)
                 {
@@ -138,6 +139,7 @@ namespace Services
                 _logger.Error(ex, "Error processing message: {Message}", ex.Message);
             }
         }
+        
     }
     
     
