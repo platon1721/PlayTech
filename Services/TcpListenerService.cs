@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using Avalonia.Threading;
 using Models;
 using Serilog;
 
@@ -14,13 +13,15 @@ namespace Services
         private readonly int _port = 4948;
         private bool _isRunning;
         private readonly ILogger _logger;
+        private readonly IDispatcher _dispatcher;
         
         public event EventHandler<Statistics>? StatisticsReceived;
 
         
-        public TcpListenerService(ILogger? logger = null)
+        public TcpListenerService(ILogger? logger = null, IDispatcher? dispatcher = null)
         {
             _logger = logger ?? Log.Logger;
+            _dispatcher = dispatcher ?? new AvaloniaDispatcher();
         }
         
         public void Start()
@@ -96,26 +97,48 @@ namespace Services
             {
                 _logger.Information("Processing received message: {Message}", message);
                 
+                if (string.IsNullOrWhiteSpace(message)) 
+                {
+                    _logger.Warning("Received empty message, ignoring");
+                    return;
+                }
+                
                 var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 };
         
                 var statistics = JsonSerializer.Deserialize<Statistics>(message, options);
+                
+                if (statistics == null)
+                {
+                    _logger.Warning("Failed to deserialize message");
+                    return;
+                }
+                
                 _logger.Information("Recived statistics: ActivePlayers={ActivePlayers}, BiggestMultiplier={BiggestMultiplier}",
                     statistics?.ActivePlayers, statistics?.BiggestMultiplier);
-                if (statistics != null)
+                
+                bool hasValidData = statistics.ActivePlayers > 0 || statistics.BiggestMultiplier > 0;
+                
+                if (hasValidData)
                 {
-                    Dispatcher.UIThread.Post(() =>
+                    _dispatcher.Post(() =>
                     {
                         StatisticsReceived?.Invoke(this, statistics);
                     });
                 }
+                else
+                {
+                    _logger.Warning("Received statistics with no useful values, ignoring");
+                }
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Error TCP client: Message processing failed");
+                _logger.Error(ex, "Error processing message: {Message}", ex.Message);
             }
         }
     }
+    
+    
 }
